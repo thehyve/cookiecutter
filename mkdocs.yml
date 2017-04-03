@@ -1,4 +1,4 @@
-site_name: Flask-Base Documentation
+site_name: Data-Portal Documentation
 pages: 
   - Home: index.md
   - Setup: setup.md
