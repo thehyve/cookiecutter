@@ -1,0 +1,50 @@
+{% extends 'layouts/base.html' %}
+
+{% set endpoints = [
+    ('admin.configure_transmart', 'TranSMART configuration'),
+    ('admin.change_url', 'Change URL'),
+    ('admin.change_version', 'Change version'),
+    ('admin.sync', 'Synchronize data now')
+] %}
+
+{% macro navigation(items) %}
+    <div class="ui vertical fluid secondary menu">
+        {% for route, name in items %}
+            <a class="item {% if request.endpoint == route %}active{% endif %}" href="{{ href }}">
+                {{ name }}
+            </a>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+{% macro transmart_info(tm) %}
+    <table class="ui compact definition table">
+        <tr>
+            <td>URL</td>
+            <td> https://blabla.thehyve.net</td>
+        </tr>
+        <tr>
+            <td>Version</td>
+            <td> 1.2</td>
+        </tr>
+    </table>
+{% endmacro %}
+{% block content %}
+    <div class="ui stackable centered grid container">
+        <h1>Configure transmart</h1>
+
+        <div class="stretched divided very relaxed row">
+            <div class="four wide column">
+                {{ navigation(endpoints) }}
+            </div>
+            <div class="eight wide column">
+
+                {% if form %}
+                    {{ f.render_form(form) }}
+                {% else %}
+                    {{ transmart_info() }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
