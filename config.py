@@ -20,6 +20,8 @@ if os.path.exists('config.env'):
 
 class Config:
     APP_NAME = os.environ.get('APP_NAME') or 'Cookiecutter'
+    TRANSMART_URL = os.environ.get('TRANSMART_URL') or 'http://localhost:8080/transmart'
+    TRANSMART_VERSION = os.environ.get('TRANSMART_VERSION') or '1.2'
     if os.environ.get('SECRET_KEY'):
         SECRET_KEY = os.environ.get('SECRET_KEY')
     else:

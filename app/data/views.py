@@ -7,6 +7,7 @@ from . import admin
 from .. import db
 from ..decorators import admin_required
 from ..models import Role, User
+from ..tm_extractor import sync
 
 
 @admin.route('/configure-transmart', methods=['GET', 'POST'])
@@ -19,5 +20,7 @@ def configure_transmart():
 @admin.route('/sync', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def sync():
-    return render_template('admin/configure_transmart.html')
+def sync_data():
+    
+    sync(username, password, tm_url)
+    return 'ok', 200
