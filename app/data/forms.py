@@ -10,9 +10,7 @@ class ChangeTransmartUrl(Form):
     submit = SubmitField('Update url')
 
 
-
-
 class ChangeTransmartVersion(Form):
     version = StringField(
         'New Version', validators=[InputRequired(), Length(1, 128)])
-    submit = SubmitField('Update role')
+    submit = SubmitField('Update version')

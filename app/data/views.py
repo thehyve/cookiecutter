@@ -1,26 +1,58 @@
 from flask import abort, flash, redirect, render_template, url_for, request
 from flask_login import current_user, login_required
-from flask_rq import get_queue
 
 from .forms import (ChangeTransmartUrl, ChangeTransmartVersion)
-from . import admin
+from . import data
 from .. import db
 from ..decorators import admin_required
+from flask import current_app as app
 from ..models import Role, User
 from ..tm_extractor import sync
 
 
-@admin.route('/configure-transmart', methods=['GET', 'POST'])
+@data.route('/configure-transmart', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def configure_transmart():
-    return render_template('admin/configure_transmart.html')
+    print(app.config)
+    tm_url = app.config['TRANSMART_URL']
+    tm_version = app.config['TRANSMART_VERSION']
+    return render_template('data/configure_transmart.html',  tm_url=tm_url,
+                           tm_version=tm_version)
 
 
-@admin.route('/sync', methods=['GET', 'POST'])
+@data.route('/change-version', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def sync_data():
-    
+def change_version():
+    form = ChangeTransmartVersion()
+    tm_url = app.config['TRANSMART_URL']
+    tm_version = app.config['TRANSMART_VERSION']
+    if form.validate_on_submit():
+        app.config['TRANSMART_VERSION'] = form.version.data
+        flash('Transmart URL changed', 'form-success')
+    return render_template('data/configure_transmart.html', tm_url=tm_url,
+                           tm_version=tm_version, form=form)
+
+
+@data.route('/change-url', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def change_url():
+    form = ChangeTransmartUrl()
+    tm_url = app.config['TRANSMART_URL']
+    tm_version = app.config['TRANSMART_VERSION']
+    if form.validate_on_submit():
+        app.config['TRANSMART_URL'] = form.url.data
+        print(app.config)
+        flash('Transmart URL changed', 'form-success')
+    return render_template('data/configure_transmart.html', tm_url=tm_url,
+                           tm_version=tm_version, form=form)
+
+
+@data.route('/sync', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def sync():
     sync(username, password, tm_url)
     return 'ok', 200

@@ -18,18 +18,6 @@ def index():
     """Admin dashboard page."""
     return render_template('admin/index.html')
 
-@admin.route('/configure-transmart', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def configure_transmart():
-    return render_template('admin/configure_transmart.html')
-
-@admin.route('/sync', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def sync():
-    return render_template('admin/configure_transmart.html')
-
 
 @admin.route('/new-user', methods=['GET', 'POST'])
 @login_required
