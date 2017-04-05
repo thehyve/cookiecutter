@@ -10,7 +10,7 @@ class Study(db.Model):
 class Variable(db.Model):
     __tablename__ = 'variables'
     id = db.Column(db.Integer, primary_key=True)
-    path = db.Column(db.String(64), unique=True)
+    path = db.Column(db.String(256))
     code = db.Column(db.String(64))
     label = db.Column(db.String(64))
     var_type = db.Column(db.String(64))

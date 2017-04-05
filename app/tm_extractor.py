@@ -35,7 +35,7 @@ def authenticate(username, password, transmart_url, uses_post=False):
     else:
         response = rq.get(url, headers=headers)
     if response.ok:
-        return response['access_token']
+        return response.json()['access_token']
     else:
         return None
 
@@ -65,7 +65,7 @@ def get_studies(token, transmart_url):
     headers = get_auth_headers(token)
     response = rq.get(call, headers=headers)
     studies = response.json()['studies']
-    studies = [s.id for s in studies]
+    studies = [s['id'] for s in studies]
     return studies
 
 
