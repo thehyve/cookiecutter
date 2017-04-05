@@ -1,7 +1,40 @@
 {% extends 'layouts/base.html' %}
 
+{% macro study_tile(study, description = None) %}
+    <a class="column" href="study">
+        <div class="ui padded segment">
+            <h3 class="ui header">
+                {% if icon is not none %}
+                    <i class="{{ icon }}"></i>
+                {% endif %}
+                <div class="content">
+                    {{ study.name }}
+                    {% if description is not none %}
+                        <div class="sub header">
+                            {{ description }}
+                        </div>
+                    {% endif %}
+                </div>
+            </h3>
+        </div>
+    </a>
+{% endmacro %}
+
+
 {% block content %}
     <div class="ui text container">
-   Welcome to TranSMART Data-Portal
+        Welcome to TranSMART Data-Portal
+    </div>
+    <div class="ui stackable centered grid container">
+        <div class="twelve wide column">
+            <h2 class="ui header">
+                Available Studies
+            </h2>
+            <div class="ui two column stackable grid">
+                {% for study in studies %}
+                {{ study_tile(study) }}
+                {% endfor %}
+            </div>
+        </div>
     </div>
 {% endblock %}
