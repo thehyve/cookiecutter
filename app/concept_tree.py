@@ -7,7 +7,7 @@ def build_tree(concepts):
     nodes = []
     for var in concepts:
         splittage = var.path.split(TM_SEP)
-        print(splittage)
+        splittage = list(filter(lambda x: x, splittage))
         nodes.append(TreeNode(splittage, var))
     merged_node = nodes.pop(0)
     for node in nodes:
