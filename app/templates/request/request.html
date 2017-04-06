@@ -1,4 +1,7 @@
-<div class="page-header"><h1> Selected study: {{ studyname }}</h1></div>
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="page-header"><h1> Selected study: {{ study_name }}</h1></div>
 <caption>
     <p class="lead"><strong> Variable selection </strong></p>
 </caption>
@@ -6,10 +9,10 @@
 <div class="row">
 
     <div class="col-md-6">
-        <button class="form-control" ng-click="uncheckAll()">Un-check All</button>
+        <button class="form-control" onclick="uncheckAll()">Un-check All</button>
     </div>
     <div class="col-md-6">
-        <button class="form-control" ng-click="checkAll()">Check all</button>
+        <button class="form-control" onclick="checkAll()">Check all</button>
     </div>
 </div>
 <div class="row">
@@ -17,54 +20,51 @@
         <input id="search_box" type="text" class="form-control" placeholder="Search ...">
     </div>
 </div>
-<div class="row" ng-if="tree">
-</div>
-<div id="frmt" class="demo"></div>
-<div class="row">
-    <div ng-if="tmTree.length == 0">
-        <div class="col-md-4">
-            <i> No items match your search criteria ...</i>
-        </div>
-    </div>
 
-</div>
+<div id="frmt" class="demo"></div>
+
 <script>
-    $scope.checkAll = function () {
+    function checkAll  () {
         $('#frmt').jstree().select_all();
     };
 
-    $scope.uncheckAll = function () {
+    function uncheckAll () {
         $('#frmt').jstree().deselect_all();
     };
+
+    var selectedVars = new Set();
 
     var _events = function () {
         $('#frmt')
             .on('select_node.jstree', function (e, data) {
-                console.log('selected' + data['node']['original']['tmVariable']['varid']);
-                $scope.selectedVars.add(data['node']['original']['tmVariable']['varid']);
+                var selectedVar = data['node']['original']['tmVariable']['id'];
+                var selectedDebug = data['node']['original']['tmVariable'];
+                console.log(selectedDebug);
+                selectedVars.add(selectedVar);
             })
             .on('deselect_node.jstree', function (e, data) {
-                console.log('deselected' + data['node']['original']['tmVariable']['varid']);
-                $scope.selectedVars.delete(data['node']['original']['tmVariable']['varid']);
+                var selectedVar = data['node']['original']['tmVariable']['id'];
+                console.log('deselected' + selectedVar);
+                selectedVars.delete(selectedVar);
             })
             .on('deselect_all.jstree', function () {
-                $scope.selectedVars = new Set();
+                selectedVars = new Set();
             }).on('select_all.jstree', function (e, data) {
             var r = $('#frmt').jstree().get_selected(true);
             _.each(r, function (node) {
                 var tmVar = node['original']['tmVariable'];
                 if (tmVar !== undefined && tmVar !== null && node['original']['leaf'] === true) {
-                    $scope.selectedVars.add(tmVar['varid']);
+                    selectedVars.add(tmVar['id']);
                 }
             });
-            console.log($scope.selectedVars);
+            console.log(selectedVars);
         })
     };
 
     $('#frmt').jstree(
         {
             'core': {
-                'data': d
+                'data': {{ concept_tree|safe }}
             },
             'search': {
                 'fuzzy': true,
@@ -83,5 +83,6 @@
             $('#frmt').jstree(true).search(v);
         }, 400);
     });
-
+    _events();
 </script>
+{% endblock %}

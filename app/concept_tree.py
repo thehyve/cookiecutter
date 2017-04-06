@@ -1,21 +1,33 @@
-TM_SEP = "\\\\"
+import json
+
+TM_SEP = "\\"
 
 
 def build_tree(concepts):
     nodes = []
     for var in concepts:
         splittage = var.path.split(TM_SEP)
+        print(splittage)
         nodes.append(TreeNode(splittage, var))
     merged_node = nodes.pop(0)
     for node in nodes:
         merged_node.merge(node)
-    return [merged_node]
+    return merged_node
+
+
+class TreeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, TreeNode):
+            return obj.as_dict()
+        else:
+            return json.JSONEncoder.default(self, obj)
 
 
 class TreeNode:
     def __init__(self, path, var):
         assert var is not None
         assert path is not None
+        assert len(path) > 0
         self.text = ''
         self.children = []
         self.tmVariable = {}
@@ -26,7 +38,11 @@ class TreeNode:
         if len(path) > 0 and not is_categorical_folder(path, var):
             self.children.append(TreeNode(path, var))
         else:
-            self.tmVariable = var
+            self.tmVariable = {'id': var.id,
+                               'code': var.code,
+                               'label': var.label,
+                               'type': var.type,
+                               }
         if not self.is_leaf():
             self.state['opened'] = True
             self.icon = None
@@ -55,8 +71,19 @@ class TreeNode:
         else:
             return False
 
+    def as_dict(self):
+        dict_rep = {
+            'text': self.text,
+            'children': [child.as_dict() for child in self.children],
+            'tmVariable': self.tmVariable,
+            'state': self.state,
+            'icon': self.icon,
+            'leaf': self.is_leaf(),
+        }
+        return dict_rep
+
 
 def is_categorical_folder(path, var):
-    isFolder = len(path) == 1  # about to add leaf
-    isCat = var.type == "CATEGORICAL_OPTION"
-    return isFolder and isCat
+    is_folder = len(path) == 1  # about to add leaf
+    is_cat = var.type == "CATEGORICAL_OPTION"
+    return is_folder and is_cat

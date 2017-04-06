@@ -51,7 +51,7 @@ def get_variables(study, token, transmart_url):
         new_var = Variable()
         new_var.path = concept['fullName']
         new_var.code = concept['name']
-        new_var.var_type = concept['type']
+        new_var.type = concept['type']
         variables.append(new_var)
     return variables
 

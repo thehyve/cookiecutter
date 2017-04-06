@@ -74,4 +74,7 @@ def create_app(config_name):
     from .data import data as data_blueprint
     app.register_blueprint(data_blueprint, url_prefix='/data')
 
+    from .request import request_blueprint
+    app.register_blueprint(request_blueprint, url_prefix='/request')
+
     return app
