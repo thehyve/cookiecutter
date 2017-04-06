@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html' %}
 
 {% macro study_tile(study, description = None) %}
-    <a class="column" href="study">
+    <a class="column" href="{{ url_for('request.request_view', study_name=study.name) }}">
         <div class="ui padded segment">
             <h3 class="ui header">
                 {% if icon is not none %}
@@ -9,6 +9,10 @@
                 {% endif %}
                 <div class="content">
                     {{ study.name }}
+                    <div>
+                        <span> Patients: {{ study.patients }}</span>
+                        <span> Variables: {{ study.variables }}</span>
+                    </div>
                     {% if description is not none %}
                         <div class="sub header">
                             {{ description }}
@@ -32,7 +36,7 @@
             </h2>
             <div class="ui two column stackable grid">
                 {% for study in studies %}
-                {{ study_tile(study) }}
+                    {{ study_tile(study) }}
                 {% endfor %}
             </div>
         </div>

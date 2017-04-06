@@ -23,6 +23,9 @@ def sync(username, password, transmart_url, uses_post=False):
         for variable in variables:
             variable.study_id = new_study.id
             db.session.add(variable)
+        patients = get_patients(new_study.name, token, transmart_url)
+        new_study.patients = len(patients)
+        new_study.variables = len(variables)
     db.session.commit()
 
 
@@ -69,8 +72,12 @@ def get_studies(token, transmart_url):
     return studies
 
 
-def get_patients(token, transmart_url):
-    pass
+def get_patients(study, token, transmart_url):
+    call = "{0}/studies/{1}/subjects".format(transmart_url, study)
+    headers = get_auth_headers(token)
+    response = rq.get(call, headers=headers)
+    patients = response.json()["subjects"]
+    return patients
 
 
 def get_observations(token, transmart_url, concept_paths):
