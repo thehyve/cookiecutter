@@ -1,88 +1,101 @@
 {% extends 'layouts/base.html' %}
 
+{% macro request_field(name, mandatory = False) %}
+    <input type="text" id="field-{{ name }}">
+    <label for="field-{{ name }}"> {{ name }}</label>
+{% endmacro %}
+
+{% macro request_form(fields) %}
+    <form>
+        {% for field in fields %}
+            {{ request_field(field.name, field.mandatory) }}
+        {% endfor %}
+    </form>
+{% endmacro %}
+
 {% block content %}
-<div class="page-header"><h1> Selected study: {{ study_name }}</h1></div>
-<caption>
-    <p class="lead"><strong> Variable selection </strong></p>
-</caption>
+    <div class="page-header"><h1> Selected study: {{ study_name }}</h1></div>
+    <caption>
+        <p class="lead"><strong> Variable selection </strong></p>
+    </caption>
 
-<div class="row">
+    <div class="row">
 
-    <div class="col-md-6">
-        <button class="form-control" onclick="uncheckAll()">Un-check All</button>
+        <div class="col-md-6">
+            <button class="form-control" onclick="uncheckAll()">Un-check All</button>
+        </div>
+        <div class="col-md-6">
+            <button class="form-control" onclick="checkAll()">Check all</button>
+        </div>
     </div>
-    <div class="col-md-6">
-        <button class="form-control" onclick="checkAll()">Check all</button>
+    <div class="row">
+        <div class="col-md-4">
+            <input id="search_box" type="text" class="form-control" placeholder="Search ...">
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-4">
-        <input id="search_box" type="text" class="form-control" placeholder="Search ...">
-    </div>
-</div>
 
-<div id="frmt" class="demo"></div>
+    <div id="frmt" class="demo"></div>
+    {{ request_form(fields) }}
+    <script>
+        function checkAll() {
+            $('#frmt').jstree().select_all();
+        };
 
-<script>
-    function checkAll  () {
-        $('#frmt').jstree().select_all();
-    };
+        function uncheckAll() {
+            $('#frmt').jstree().deselect_all();
+        };
 
-    function uncheckAll () {
-        $('#frmt').jstree().deselect_all();
-    };
+        var selectedVars = new Set();
 
-    var selectedVars = new Set();
-
-    var _events = function () {
-        $('#frmt')
-            .on('select_node.jstree', function (e, data) {
-                var selectedVar = data['node']['original']['tmVariable']['id'];
-                var selectedDebug = data['node']['original']['tmVariable'];
-                console.log(selectedDebug);
-                selectedVars.add(selectedVar);
+        var _events = function () {
+            $('#frmt')
+                .on('select_node.jstree', function (e, data) {
+                    var selectedVar = data['node']['original']['tmVariable']['id'];
+                    var selectedDebug = data['node']['original']['tmVariable'];
+                    console.log(selectedDebug);
+                    selectedVars.add(selectedVar);
+                })
+                .on('deselect_node.jstree', function (e, data) {
+                    var selectedVar = data['node']['original']['tmVariable']['id'];
+                    console.log('deselected' + selectedVar);
+                    selectedVars.delete(selectedVar);
+                })
+                .on('deselect_all.jstree', function () {
+                    selectedVars = new Set();
+                }).on('select_all.jstree', function (e, data) {
+                var r = $('#frmt').jstree().get_selected(true);
+                _.each(r, function (node) {
+                    var tmVar = node['original']['tmVariable'];
+                    if (tmVar !== undefined && tmVar !== null && node['original']['leaf'] === true) {
+                        selectedVars.add(tmVar['id']);
+                    }
+                });
+                console.log(selectedVars);
             })
-            .on('deselect_node.jstree', function (e, data) {
-                var selectedVar = data['node']['original']['tmVariable']['id'];
-                console.log('deselected' + selectedVar);
-                selectedVars.delete(selectedVar);
-            })
-            .on('deselect_all.jstree', function () {
-                selectedVars = new Set();
-            }).on('select_all.jstree', function (e, data) {
-            var r = $('#frmt').jstree().get_selected(true);
-            _.each(r, function (node) {
-                var tmVar = node['original']['tmVariable'];
-                if (tmVar !== undefined && tmVar !== null && node['original']['leaf'] === true) {
-                    selectedVars.add(tmVar['id']);
-                }
+        };
+
+        $('#frmt').jstree(
+            {
+                'core': {
+                    'data': {{ concept_tree|safe }}
+                },
+                'search': {
+                    'fuzzy': true,
+                    'show_only_matches': true
+                },
+                'plugins': ['checkbox', 'search']
             });
-            console.log(selectedVars);
-        })
-    };
 
-    $('#frmt').jstree(
-        {
-            'core': {
-                'data': {{ concept_tree|safe }}
-            },
-            'search': {
-                'fuzzy': true,
-                'show_only_matches': true
-            },
-            'plugins': ['checkbox', 'search']
+        var to = false;
+        $('#search_box').keyup(function () {
+            if (to) {
+                clearTimeout(to);
+            }
+            to = setTimeout(function () {
+                var v = $('#search_box').val();
+                $('#frmt').jstree(true).search(v);
+            }, 400);
         });
-
-    var to = false;
-    $('#search_box').keyup(function () {
-        if (to) {
-            clearTimeout(to);
-        }
-        to = setTimeout(function () {
-            var v = $('#search_box').val();
-            $('#frmt').jstree(true).search(v);
-        }, 400);
-    });
-    _events();
-</script>
+        _events();
+    </script>
 {% endblock %}

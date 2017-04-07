@@ -14,6 +14,14 @@ class RequestVariable(db.Model):
     variable_id = db.Column(db.Integer)
 
 
+class RequestFieldAnswer(db.Model):
+    __tablename__ = 'request_field_answer'
+    id = db.Column(db.Integer, primary_key=True)
+    request_id = db.Column(db.Integer)
+    variable_id = db.Column(db.Integer)
+    answer = db.Column(db.Text)
+
+
 class RequestProcess(db.Model):
     __tablename__ = 'request_processes'
     id = db.Column(db.Integer, primary_key=True)
@@ -34,6 +42,6 @@ class ProcessStep(db.Model):
 class RequestField(db.Model):
     __tablename__ = 'request_fields'
     id = db.Column(db.Integer, primary_key=True)
+    process_id = db.Column(db.Integer)
     name = db.Column(db.String(64))
-    value = db.Column(db.Text)
     mandatory = db.Column(db.Boolean)

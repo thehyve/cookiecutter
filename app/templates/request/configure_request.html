@@ -1,0 +1,12 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+    User email and full name is always included in any request and does not need
+    to be added to this list
+    <ul>
+        {% for field in fields %}
+            <li> field.name <input type="button" value="remove"></li>
+        {% endfor %}
+        <input type="button" value="add new field">
+    </ul>
+{% endblock %}

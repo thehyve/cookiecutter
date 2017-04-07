@@ -1,0 +1,12 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+    <table>
+        <thead>
+            <th> Request ID</th>
+        </thead>
+        {% for request in requests %}
+            <td> request.id</td>
+        {% endfor %}
+    </table>
+{% endblock %}
