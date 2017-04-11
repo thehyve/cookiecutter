@@ -28,10 +28,10 @@ def my_requests():
     return render_template('request/myrequests.html', requests=requests)
 
 
-@request_blueprint.route('/', methods=['GET', 'POST'])
+@request_blueprint.route('/configure', methods=['GET', 'POST'])
 @login_required
 def configure_request():
     approval_process = RequestProcess.query.filter(RequestProcess.version == 1).first()
     fields = RequestField.query \
-        .filter(RequestField.process_id == approval_process.id).first()
+        .filter(RequestField.process_id == approval_process.id).all()
     return render_template('request/configure_request.html', fields=fields)

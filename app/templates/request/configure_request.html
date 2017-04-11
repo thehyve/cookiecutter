@@ -5,7 +5,7 @@
     to be added to this list
     <ul>
         {% for field in fields %}
-            <li> field.name <input type="button" value="remove"></li>
+            <li>  <input type="button" value="remove"> {{ field.name  }} </li>
         {% endfor %}
         <input type="button" value="add new field">
     </ul>
