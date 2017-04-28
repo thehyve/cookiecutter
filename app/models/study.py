@@ -32,3 +32,5 @@ class Attachment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256))
     filesystem_path = db.Column(db.String(4096))
+    study_id = db.Column(db.Integer) # only one of the two can be set at the same time
+    request_id = db.Column(db.Integer)
