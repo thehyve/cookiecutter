@@ -1,6 +1,7 @@
-from collections import namedtuple
-from wtforms import Form, FieldList, BooleanField, HiddenField, FormField
-
+from flask_wtf import Form
+from wtforms.fields import StringField, SubmitField, BooleanField
+from wtforms.validators import InputRequired, Length
+"""
 RequestItem = namedtuple('RequestItem', ['item_id', 'want', 'name'])
 
 
@@ -22,3 +23,12 @@ class RequestListForm(Form):
                     item_form.label = item.name
 
     items = FieldList(FormField(RequestItemForm))
+
+"""
+
+
+class NewFieldForm(Form):
+    field_name = StringField(
+            'Field Name', validators=[InputRequired(), Length(1, 128)])
+    mandatory = BooleanField('Mandatory', validators=[InputRequired()])
+    submit = SubmitField('Add new field')

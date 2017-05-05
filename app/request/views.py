@@ -2,6 +2,7 @@ import json
 from flask import render_template
 
 from . import request_blueprint
+from .forms import NewFieldForm
 
 from ..models import (Variable, Study, Request,
                       RequestProcess, RequestField)
@@ -32,8 +33,9 @@ def my_requests():
 @login_required
 def configure_request():
     approval_process = RequestProcess.query.filter(RequestProcess.version == 1).first()
+    form = NewFieldForm()
     if not approval_process:
-        return render_template('request/configure_request.html', fields=[])
+        return render_template('request/configure_request.html', fields=[], form=form)
     fields = RequestField.query \
         .filter(RequestField.process_id == approval_process.id).all()
-    return render_template('request/configure_request.html', fields=fields)
+    return render_template('request/configure_request.html', fields=fields, form=form)

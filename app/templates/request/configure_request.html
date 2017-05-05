@@ -1,4 +1,5 @@
 {% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
 
 {% block content %}
     User email and full name is always included in any request and does not need
@@ -7,6 +8,10 @@
         {% for field in fields %}
             <li>  <input type="button" value="remove"> {{ field.name  }} </li>
         {% endfor %}
-        <input type="button" value="add new field">
+        {% if form %}
+            {{  f.render_form(form) }}
+        {% endif %}
+
+
     </ul>
 {% endblock %}
