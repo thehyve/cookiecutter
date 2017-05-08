@@ -8,6 +8,7 @@
         {% for field in fields %}
             <li>  <input type="button" value="remove"> {{ field.name  }} </li>
         {% endfor %}
+
         {% if form %}
             {{  f.render_form(form) }}
         {% endif %}

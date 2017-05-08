@@ -30,5 +30,5 @@ class RequestListForm(Form):
 class NewFieldForm(Form):
     field_name = StringField(
             'Field Name', validators=[InputRequired(), Length(1, 128)])
-    mandatory = BooleanField('Mandatory', validators=[InputRequired()])
+    mandatory = BooleanField('Mandatory', default=False)
     submit = SubmitField('Add new field')

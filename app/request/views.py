@@ -9,6 +9,7 @@ from ..models import (Variable, Study, Request,
 from ..concept_tree import build_tree, TreeEncoder
 
 from flask_login import login_required
+from .. import db
 
 
 @request_blueprint.route('/<study_name>', methods=['GET', 'POST'])
@@ -32,10 +33,22 @@ def my_requests():
 @request_blueprint.route('/configure', methods=['GET', 'POST'])
 @login_required
 def configure_request():
-    approval_process = RequestProcess.query.filter(RequestProcess.version == 1).first()
     form = NewFieldForm()
+    approval_process = RequestProcess.query.filter(RequestProcess.version == 1).first()
     if not approval_process:
-        return render_template('request/configure_request.html', fields=[], form=form)
+        approval_process = RequestProcess()
+        RequestProcess.version = 1
+        db.session.add(approval_process)
+        db.session.commit()
+    if form.validate_on_submit():
+        field_name = form.field_name.data
+        is_mandatory = form.mandatory.data
+        new_field = RequestField()
+        new_field.mandatory = is_mandatory
+        new_field.name = field_name
+        new_field.process_id = approval_process.id
+        db.session.add(new_field)
+        db.session.commit()
     fields = RequestField.query \
         .filter(RequestField.process_id == approval_process.id).all()
     return render_template('request/configure_request.html', fields=fields, form=form)
