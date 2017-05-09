@@ -19,8 +19,10 @@ def request_view(study_name):
     variables = Variable.query.filter(Variable.study_id == study.id).all()
     concept_tree = build_tree(variables)
     concept_tree = json.dumps(concept_tree, cls=TreeEncoder)
+    approval_process = RequestProcess.query.filter(RequestProcess.version == 1).first()
+    fields = RequestField.query.filter(RequestField.process_id == approval_process.id).all()
     return render_template('request/request.html',
-                           concept_tree=concept_tree, study_name=study_name)
+                           concept_tree=concept_tree, study_name=study_name, fields=fields)
 
 
 @request_blueprint.route('/', methods=['GET', 'POST'])
