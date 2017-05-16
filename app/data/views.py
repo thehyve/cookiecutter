@@ -63,3 +63,9 @@ def sync_view():
         sync(username, password, tm_url)
     return render_template('data/configure_transmart.html', tm_url=tm_url,
                            tm_version=tm_version,  form=form)
+
+
+@data.route('/sync', methods=['GET', 'POST'])
+@login_required
+def my_data():
+    return render_template('data/my_data.html')

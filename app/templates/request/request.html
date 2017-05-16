@@ -1,17 +1,5 @@
 {% extends 'layouts/base.html' %}
-
-{% macro request_field(name, mandatory = False) %}
-    <input type="text" id="field-{{ name }}">
-    <label for="field-{{ name }}"> {{ name }}</label>
-{% endmacro %}
-
-{% macro request_form(fields) %}
-    <form>
-        {% for field in fields %}
-            {{ request_field(field.name, field.mandatory) }}
-        {% endfor %}
-    </form>
-{% endmacro %}
+{% import 'macros/form_macros.html' as f %}
 
 {% block content %}
     <div class="page-header"><h1> Selected study: {{ study_name }}</h1></div>
@@ -35,7 +23,7 @@
     </div>
 
     <div id="frmt" class="demo"></div>
-    {{ request_form(fields) }}
+    {{ f.render_form(form) }}
     <script>
         function checkAll() {
             $('#frmt').jstree().select_all();
