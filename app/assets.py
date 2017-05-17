@@ -7,6 +7,7 @@ app_js = Bundle('app.js', filters='jsmin', output='scripts/app.js')
 vendor_css = Bundle(
     'vendor/semantic.min.css',
     'vendor/jstree.min.css',
+    'vendor/bootstrap.min.css',
     output='styles/vendor.css')
 
 vendor_js = Bundle(
@@ -16,5 +17,6 @@ vendor_js = Bundle(
     'vendor/zxcvbn.js',
     'vendor/jstree.min.js',
     'vendor/lodash.js',
+    'vendor/bootstrap.min.js',
     filters='jsmin',
     output='scripts/vendor.js')

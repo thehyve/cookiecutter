@@ -1,12 +1,22 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
-    <table>
-        <thead>
+    <table class="table table-bordered">
+        <tr>
             <th> Request ID</th>
-        </thead>
+            <th> Requestor</th>
+            <th> Study</th>
+            <th> Variables</th>
+            <th> See Request</th>
+        </tr>
         {% for request in requests %}
-            <td> request.id</td>
+            <tr>
+                <td> {{ request.id }}</td>
+                <td> placeholder</td>
+                <td> placeholder</td>
+                <td> placeholder</td>
+                <td> placeholder</td>
+            </tr>
         {% endfor %}
     </table>
 {% endblock %}

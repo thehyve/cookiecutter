@@ -4,7 +4,9 @@ from .. import db
 class Request(db.Model):
     __tablename__ = 'requests'
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer)
     study_id = db.Column(db.Integer)
+    status = db.Column(db.String)
 
 
 class RequestVariable(db.Model):
