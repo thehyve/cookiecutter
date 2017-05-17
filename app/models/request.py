@@ -17,8 +17,8 @@ class RequestVariable(db.Model):
 class RequestFieldAnswer(db.Model):
     __tablename__ = 'request_field_answer'
     id = db.Column(db.Integer, primary_key=True)
+    field_id = db.Column(db.Integer)
     request_id = db.Column(db.Integer)
-    variable_id = db.Column(db.Integer)
     answer = db.Column(db.Text)
 
 

@@ -34,7 +34,11 @@
         };
 
         var selectedVars = new Set();
-
+        var populate_req_form = function(vars) {
+            var varsArray = Array.from(vars);
+            var serialized_vars =  varsArray.join(',');
+            document.getElementById('request_vars').value = serialized_vars;
+        };
         var _events = function () {
             $('#frmt')
                 .on('select_node.jstree', function (e, data) {
@@ -42,14 +46,17 @@
                     var selectedDebug = data['node']['original']['tmVariable'];
                     console.log(selectedDebug);
                     selectedVars.add(selectedVar);
+                    populate_req_form(selectedVars);
                 })
                 .on('deselect_node.jstree', function (e, data) {
                     var selectedVar = data['node']['original']['tmVariable']['id'];
                     console.log('deselected' + selectedVar);
                     selectedVars.delete(selectedVar);
+                    populate_req_form(selectedVars);
                 })
                 .on('deselect_all.jstree', function () {
                     selectedVars = new Set();
+                    populate_req_form(selectedVars);
                 }).on('select_all.jstree', function (e, data) {
                 var r = $('#frmt').jstree().get_selected(true);
                 _.each(r, function (node) {
@@ -58,6 +65,7 @@
                         selectedVars.add(tmVar['id']);
                     }
                 });
+                populate_req_form(selectedVars);
                 console.log(selectedVars);
             })
         };
