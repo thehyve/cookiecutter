@@ -3,28 +3,45 @@
 
 {% block content %}
     <div class="page-header"><h1> Selected study: {{ study_name }}</h1></div>
-    <caption>
-        <p class="lead"><strong> Variable selection </strong></p>
-    </caption>
+    {% if form %}
+        <caption>
+            <p class="lead"><strong> Variable selection </strong></p>
+        </caption>
 
-    <div class="row">
+        <div class="row">
 
-        <div class="col-md-6">
-            <button class="form-control" onclick="uncheckAll()">Un-check All</button>
+            <div class="col-md-6">
+                <button class="form-control" onclick="uncheckAll()">Un-check All</button>
+            </div>
+            <div class="col-md-6">
+                <button class="form-control" onclick="checkAll()">Check all</button>
+            </div>
         </div>
-        <div class="col-md-6">
-            <button class="form-control" onclick="checkAll()">Check all</button>
+
+        <div class="row">
+            <div class="col-md-4">
+                <input id="search_box" type="text" class="form-control" placeholder="Search ...">
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4">
-            <input id="search_box" type="text" class="form-control" placeholder="Search ...">
-        </div>
-    </div>
+    {% endif %}
 
     <div id="frmt" class="demo"></div>
     {% if form %}
         {{ f.render_form(form) }}
+    {% endif %}
+    {% if answers %}
+        <table class="table table-bordered">
+            <tr>
+                <th> Field</th>
+                <th> Answer</th>
+            </tr>
+            {% for answer in answers %}
+                <tr>
+                    <td> {{ answer.field.name }} </td>
+                    <td> {{ answer.answer }}</td>
+                </tr>
+            {% endfor %}
+        </table>
     {% endif %}
     <script>
         function checkAll() {

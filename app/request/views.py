@@ -50,7 +50,7 @@ def new_request(study_name):
         for field in fields:
             answer = RequestFieldAnswer()
             answer.answer = getattr(form, field.name).data
-            answer.request_field_id = field.id
+            answer.field_id = field.id
             answer.request_id = new_request.id
             db.session.add(answer)
         db.session.commit()
@@ -70,9 +70,10 @@ def request_view(request_id):
     selected_vars = [v.variable_id for v in selected_vars]
     concept_tree = build_tree(variables, selected_vars)
     concept_tree = json.dumps(concept_tree, cls=TreeEncoder)
+    answers = RequestFieldAnswer.query.filter(RequestFieldAnswer.request_id == req.id).all()
     return render_template('request/request.html',
                            concept_tree=concept_tree, study_name=req.study.name,
-                           selected_vars=selected_vars, form=None)
+                           selected_vars=selected_vars, form=None, answers=answers)
 
 
 @request_blueprint.route('/', methods=['GET', 'POST'])

@@ -15,15 +15,17 @@ class Request(db.Model):
 class RequestVariable(db.Model):
     __tablename__ = 'request_variables'
     id = db.Column(db.Integer, primary_key=True)
-    request_id = db.Column(db.Integer)
-    variable_id = db.Column(db.Integer)
+    request_id = db.Column(db.Integer, db.ForeignKey("requests.id"))
+    variable_id = db.Column(db.Integer, db.ForeignKey("variables.id"))
 
 
 class RequestFieldAnswer(db.Model):
     __tablename__ = 'request_field_answer'
     id = db.Column(db.Integer, primary_key=True)
-    field_id = db.Column(db.Integer)
-    request_id = db.Column(db.Integer)
+    field_id = db.Column(db.Integer, db.ForeignKey("request_fields.id"))
+    field = db.relationship("RequestField")
+    request_id = db.Column(db.Integer, db.ForeignKey("requests.id"))
+    request = db.relationship("Request")
     answer = db.Column(db.Text)
 
 

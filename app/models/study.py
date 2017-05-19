@@ -17,7 +17,8 @@ class Variable(db.Model):
     code = db.Column(db.String(64))
     label = db.Column(db.String(64))
     type = db.Column(db.String(64))
-    is_selected = db.Column(db.Boolean)  # if it is selected by default
+    in_minimal_set = db.Column(db.Boolean)  # if it is selected by default
+    is_selected = False
 
 
 
