@@ -23,7 +23,9 @@
     </div>
 
     <div id="frmt" class="demo"></div>
-    {{ f.render_form(form) }}
+    {% if form %}
+        {{ f.render_form(form) }}
+    {% endif %}
     <script>
         function checkAll() {
             $('#frmt').jstree().select_all();
@@ -34,9 +36,9 @@
         };
 
         var selectedVars = new Set();
-        var populate_req_form = function(vars) {
+        var populate_req_form = function (vars) {
             var varsArray = Array.from(vars);
-            var serialized_vars =  varsArray.join(',');
+            var serialized_vars = varsArray.join(',');
             document.getElementById('request_vars').value = serialized_vars;
         };
         var _events = function () {

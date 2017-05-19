@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html' %}
 
 {% macro study_tile(study, description = None) %}
-    <a class="column" href="{{ url_for('request.request_view', study_name=study.name) }}">
+    <a class="column" href="{{ url_for('request.new_request', study_name=study.name) }}">
         <div class="ui padded segment">
             <h3 class="ui header">
                 {% if icon is not none %}

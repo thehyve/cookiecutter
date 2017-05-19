@@ -3,9 +3,14 @@ import json
 TM_SEP = "\\"
 
 
-def build_tree(concepts):
+def build_tree(concepts, selected=None):
+    if not selected:
+        selected = set()
     nodes = []
     for var in concepts:
+        is_selected = False
+        if var.id in selected:
+            var.is_selected = True
         splittage = var.path.split(TM_SEP)
         splittage = list(filter(lambda x: x, splittage))
         nodes.append(TreeNode(splittage, var))
@@ -48,6 +53,8 @@ class TreeNode:
             self.icon = None
         else:
             self.icon = "jstree-file"
+            if var.is_selected:
+                self.state['selected'] = True
 
     def is_leaf(self):
         return len(self.children) == 0

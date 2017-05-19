@@ -6,16 +6,18 @@
             <th> Request ID</th>
             <th> Requestor</th>
             <th> Study</th>
-            <th> Variables</th>
+            <th> Date </th>
+            <th> Status </th>
             <th> See Request</th>
         </tr>
         {% for request in requests %}
             <tr>
                 <td> {{ request.id }}</td>
-                <td> placeholder</td>
-                <td> placeholder</td>
-                <td> placeholder</td>
-                <td> placeholder</td>
+                <td> {{ request.user.email }}</td>
+                <td> {{ request.study.name }}</td>
+                <td> {{ request.issued_time }}</td>
+                <td> {{ request.status }} </td>
+                <td> <a href="{{ url_for('request.request_view', request_id=request.id)}}">see request </a> </td>
             </tr>
         {% endfor %}
     </table>
