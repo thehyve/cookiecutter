@@ -26,7 +26,7 @@
     {% endif %}
 
     <div id="frmt" class="demo"></div>
-    {% if form %}
+    {% if form and not is_admin %}
         {{ f.render_form(form) }}
     {% endif %}
     {% if answers %}
@@ -43,6 +43,10 @@
             {% endfor %}
         </table>
     {% endif %}
+    {% if is_admin and form %}
+        {{ f.render_form(form) }}
+    {% endif %}
+
     <script>
         function checkAll() {
             $('#frmt').jstree().select_all();

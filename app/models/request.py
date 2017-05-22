@@ -9,6 +9,8 @@ class Request(db.Model):
     study_id = db.Column(db.Integer, db.ForeignKey("studies.id"), nullable=False)
     study = db.relationship("Study")
     status = db.Column(db.String)
+    approved = db.Column(db.Boolean)
+    denied = db.Column(db.Boolean)
     issued_time = db.Column(db.String)
 
 

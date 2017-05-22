@@ -16,14 +16,6 @@
         <h3> Add new field to the request process</h3>
         {{ f.render_form(form) }}
     {% endif %}
-    <h3> Current request stages </h3>
-    <ul>
-        {% for stage in stages %}
-            <li><input class="btn btn-danger" type="button" value="remove"> {{ stage.name }} </li>
-        {% endfor %}
-    </ul>
-    <h3> Add new stage to the request process </h3>
-    {{ f.render_form(stage_form) }}
 
 
 {% endblock %}

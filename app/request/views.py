@@ -5,7 +5,7 @@ from flask_login import current_user
 
 from . import request_blueprint
 from flask_wtf import Form
-from wtforms.fields import StringField, SubmitField, BooleanField, HiddenField
+from wtforms.fields import StringField, SubmitField, BooleanField, HiddenField, SelectField
 from wtforms.validators import InputRequired, Length
 from .forms import NewFieldForm, StageForm
 
@@ -63,7 +63,8 @@ def new_request(study_name):
 @login_required
 def request_view(request_id):
     req = Request.query.filter(Request.id == request_id).first()
-    if not current_user.id == req.user_id:
+    is_admin = current_user.is_admin()
+    if not current_user.id == req.user_id and not is_admin:
         abort(403)
     variables = Variable.query.filter(Variable.study_id == req.study.id).all()
     selected_vars = RequestVariable.query.filter(RequestVariable.request_id == req.id).all()
@@ -71,9 +72,11 @@ def request_view(request_id):
     concept_tree = build_tree(variables, selected_vars)
     concept_tree = json.dumps(concept_tree, cls=TreeEncoder)
     answers = RequestFieldAnswer.query.filter(RequestFieldAnswer.request_id == req.id).all()
+    stages = ProcessStep.query.filter(ProcessStep.request_process_id == 1).all()
+    approval_form = get_approval_form(stages)
     return render_template('request/request.html',
                            concept_tree=concept_tree, study_name=req.study.name,
-                           selected_vars=selected_vars, form=None, answers=answers)
+                           selected_vars=selected_vars, form=approval_form, answers=answers, is_admin=is_admin)
 
 
 @request_blueprint.route('/', methods=['GET', 'POST'])
@@ -141,6 +144,19 @@ def get_form(fields):
     DynamicForm = type('DynamicForm', (Form,), class_body)
     form = DynamicForm()
     return form
+
+
+def get_approval_form(stages):
+    choices = [(stage.id, stage.name )for stage in stages]
+    class_body = {'submit': SubmitField('Submit'), 'stage': SelectField('Change Request Stage', choices=choices)}
+    DynamicForm = type('DynamicForm', (Form,), class_body)
+    form = DynamicForm()
+    return form
+
+
+class ApprovalForm(Form):
+    state = SelectField('', choices=[])
+    submit = SubmitField('Submit')
 
 
 def parse_request_vars(request_vars):
