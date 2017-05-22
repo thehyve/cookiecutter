@@ -4,9 +4,7 @@ from flask import render_template, abort
 from flask_login import current_user
 
 from . import request_blueprint
-from flask_wtf import Form
-from wtforms.fields import StringField, SubmitField, BooleanField, HiddenField, SelectField
-from wtforms.validators import InputRequired, Length
+
 from .forms import NewFieldForm, StageForm
 
 from ..models import (Variable, Study, Request,
@@ -16,6 +14,7 @@ from ..concept_tree import build_tree, TreeEncoder
 
 from flask_login import login_required
 from .. import db
+from .utils import (get_approval_form, get_form, parse_request_vars, create_default_process)
 
 
 @request_blueprint.route('/new/<study_name>', methods=['GET', 'POST'])
@@ -27,10 +26,7 @@ def new_request(study_name):
     concept_tree = json.dumps(concept_tree, cls=TreeEncoder)
     approval_process = RequestProcess.query.filter(RequestProcess.version == 1).first()
     if not approval_process:
-        approval_process = RequestProcess()
-        RequestProcess.version = 1
-        db.session.add(approval_process)
-        db.session.commit()
+        create_default_process()
     fields = RequestField.query.filter(RequestField.process_id == approval_process.id).all()
     form = get_form(fields)
     if form.validate_on_submit():
@@ -93,10 +89,7 @@ def configure_request():
     form = NewFieldForm()
     approval_process = RequestProcess.query.filter(RequestProcess.version == 1).first()
     if not approval_process:
-        approval_process = RequestProcess()
-        RequestProcess.version = 1
-        db.session.add(approval_process)
-        db.session.commit()
+        create_default_process()
     if form.validate_on_submit():
         field_name = form.field_name.data
         is_mandatory = form.mandatory.data
@@ -117,10 +110,7 @@ def configure_stages():
     stage_form = StageForm()
     approval_process = RequestProcess.query.filter(RequestProcess.version == 1).first()
     if not approval_process:
-        approval_process = RequestProcess()
-        RequestProcess.version = 1
-        db.session.add(approval_process)
-        db.session.commit()
+        create_default_process()
     if stage_form.validate_on_submit():
         new_stage = ProcessStep()
         new_stage.request_process_id = approval_process.id
@@ -133,31 +123,3 @@ def configure_stages():
     stages = ProcessStep.query.filter(ProcessStep.request_process_id == approval_process.id).all()
     return render_template('request/configure_stages.html', stages=stages,
                            stage_form=stage_form)
-
-
-def get_form(fields):
-    """Create a wtf-form class out of process fields"""
-    class_body = {'submit': SubmitField('Submit Request'),
-                  'request_vars': HiddenField("request_vars")}
-    for field in fields:
-        class_body[field.name] = StringField()
-    DynamicForm = type('DynamicForm', (Form,), class_body)
-    form = DynamicForm()
-    return form
-
-
-def get_approval_form(stages):
-    choices = [(stage.id, stage.name )for stage in stages]
-    class_body = {'submit': SubmitField('Submit'), 'stage': SelectField('Change Request Stage', choices=choices)}
-    DynamicForm = type('DynamicForm', (Form,), class_body)
-    form = DynamicForm()
-    return form
-
-
-class ApprovalForm(Form):
-    state = SelectField('', choices=[])
-    submit = SubmitField('Submit')
-
-
-def parse_request_vars(request_vars):
-    return request_vars.split(',')
