@@ -2,17 +2,21 @@
 {% import 'macros/form_macros.html' as f %}
 
 {% block content %}
-    User email and full name is always included in any request and does not need
-    to be added to this list
+    <h3> <strong> Current request fields</strong> </h3>
+    <i> User email and full name is always included in any request and does not need
+        to be added to this list </i>
+
     <ul>
         {% for field in fields %}
-            <li>  <input type="button" value="remove"> {{ field.name  }} </li>
+            <li>  <input class="btn btn-danger" type="button" value="remove"> {{ field.name  }} </li>
         {% endfor %}
-
+    </ul>
         {% if form %}
+            <br>
+            <h3> Add new field to the request process</h3>
             {{  f.render_form(form) }}
         {% endif %}
 
 
-    </ul>
+
 {% endblock %}
