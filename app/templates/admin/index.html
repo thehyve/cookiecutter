@@ -34,9 +34,11 @@
                 {{ dashboard_option('Invite New User', 'admin.invite_user',
                                     description='Invites a new user to create their own account', icon='add user icon') }}
                 {{ dashboard_option('Configure Transmart', 'data.configure_transmart',
-                                    description='Configuration of TranSMART connection', icon='add user icon') }}
-                {{ dashboard_option('Configure Request Process', 'request.configure_request',
-                                    description='Configuration of the request procedure', icon='add user icon') }}
+                                    description='Configuration of TranSMART connection') }}
+                {{ dashboard_option('Configure Request Fields', 'request.configure_request',
+                                    description='Configuration of the request procedure') }}
+                {{ dashboard_option('Configure Request Stages', 'request.configure_stages',
+                        description='Configuration of the stages a request can be in') }}
             </div>
         </div>
     </div>

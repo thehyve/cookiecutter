@@ -7,11 +7,11 @@ from . import request_blueprint
 from flask_wtf import Form
 from wtforms.fields import StringField, SubmitField, BooleanField, HiddenField
 from wtforms.validators import InputRequired, Length
-from .forms import NewFieldForm
+from .forms import NewFieldForm, StageForm
 
 from ..models import (Variable, Study, Request,
                       RequestProcess, RequestField,
-                      RequestVariable, RequestFieldAnswer)
+                      RequestVariable, RequestFieldAnswer, ProcessStep)
 from ..concept_tree import build_tree, TreeEncoder
 
 from flask_login import login_required
@@ -84,7 +84,7 @@ def my_requests():
     return render_template('request/myrequests.html', requests=requests)
 
 
-@request_blueprint.route('/configure', methods=['GET', 'POST'])
+@request_blueprint.route('/configure-fields', methods=['GET', 'POST'])
 @login_required
 def configure_request():
     form = NewFieldForm()
@@ -106,6 +106,30 @@ def configure_request():
     fields = RequestField.query \
         .filter(RequestField.process_id == approval_process.id).all()
     return render_template('request/configure_request.html', fields=fields, form=form)
+
+
+@request_blueprint.route('/configure-stages', methods=['GET', 'POST'])
+@login_required
+def configure_stages():
+    stage_form = StageForm()
+    approval_process = RequestProcess.query.filter(RequestProcess.version == 1).first()
+    if not approval_process:
+        approval_process = RequestProcess()
+        RequestProcess.version = 1
+        db.session.add(approval_process)
+        db.session.commit()
+    if stage_form.validate_on_submit():
+        new_stage = ProcessStep()
+        new_stage.request_process_id = approval_process.id
+        new_stage.name = stage_form.stage_name.data
+        new_stage.description = stage_form.description.data
+        new_stage.approves = stage_form.approval.data
+        new_stage.denies = stage_form.denial.data
+        db.session.add(new_stage)
+        db.session.commit()
+    stages = ProcessStep.query.filter(ProcessStep.request_process_id == approval_process.id).all()
+    return render_template('request/configure_stages.html', stages=stages,
+                           stage_form=stage_form)
 
 
 def get_form(fields):

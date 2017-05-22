@@ -38,10 +38,9 @@ class RequestProcess(db.Model):
 class ProcessStep(db.Model):
     __tablename__ = 'process_steps'
     id = db.Column(db.Integer, primary_key=True)
-    request_process_id = db.Column(db.Integer)
+    request_process_id = db.Column(db.Integer, db.ForeignKey("request_processes.id"))
     name = db.Column(db.String(64))
     description = db.Column(db.Text)
-    final = db.Column(db.Boolean)
     approves = db.Column(db.Boolean)
     denies = db.Column(db.Boolean)
 
