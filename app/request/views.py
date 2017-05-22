@@ -5,16 +5,17 @@ from flask_login import current_user
 
 from . import request_blueprint
 
-from .forms import NewFieldForm, StageForm
+from .forms import NewFieldForm, StageForm, FinalApprovalForm
 
 from ..models import (Variable, Study, Request,
                       RequestProcess, RequestField,
                       RequestVariable, RequestFieldAnswer, ProcessStep)
+from ..decorators import admin_required
 from ..concept_tree import build_tree, TreeEncoder
 
 from flask_login import login_required
 from .. import db
-from .utils import (get_approval_form, get_form, parse_request_vars, create_default_process)
+from .utils import (get_approval_form, get_form, parse_request_vars, create_default_process, change_status)
 
 
 @request_blueprint.route('/new/<study_name>', methods=['GET', 'POST'])
@@ -26,7 +27,7 @@ def new_request(study_name):
     concept_tree = json.dumps(concept_tree, cls=TreeEncoder)
     approval_process = RequestProcess.query.filter(RequestProcess.version == 1).first()
     if not approval_process:
-        create_default_process()
+        approval_process = create_default_process()
     fields = RequestField.query.filter(RequestField.process_id == approval_process.id).all()
     form = get_form(fields)
     if form.validate_on_submit():
@@ -70,9 +71,14 @@ def request_view(request_id):
     answers = RequestFieldAnswer.query.filter(RequestFieldAnswer.request_id == req.id).all()
     stages = ProcessStep.query.filter(ProcessStep.request_process_id == 1).all()
     approval_form = get_approval_form(stages)
+    if approval_form.validate_on_submit() and is_admin:
+        current_stage = change_status(approval_form.stage.data, req)
+        if current_stage.approval:
+            pass # redirect to approval page
     return render_template('request/request.html',
                            concept_tree=concept_tree, study_name=req.study.name,
-                           selected_vars=selected_vars, form=approval_form, answers=answers, is_admin=is_admin)
+                           selected_vars=selected_vars, form=approval_form, answers=answers,
+                           is_admin=is_admin, current_stage=req.status)
 
 
 @request_blueprint.route('/', methods=['GET', 'POST'])
@@ -89,7 +95,7 @@ def configure_request():
     form = NewFieldForm()
     approval_process = RequestProcess.query.filter(RequestProcess.version == 1).first()
     if not approval_process:
-        create_default_process()
+        approval_process = create_default_process()
     if form.validate_on_submit():
         field_name = form.field_name.data
         is_mandatory = form.mandatory.data
@@ -110,7 +116,7 @@ def configure_stages():
     stage_form = StageForm()
     approval_process = RequestProcess.query.filter(RequestProcess.version == 1).first()
     if not approval_process:
-        create_default_process()
+        approval_process = create_default_process()
     if stage_form.validate_on_submit():
         new_stage = ProcessStep()
         new_stage.request_process_id = approval_process.id
@@ -123,3 +129,14 @@ def configure_stages():
     stages = ProcessStep.query.filter(ProcessStep.request_process_id == approval_process.id).all()
     return render_template('request/configure_stages.html', stages=stages,
                            stage_form=stage_form)
+
+
+@request_blueprint.route('/approve/<requestid>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def approve(requestid):
+    form = FinalApprovalForm()
+    if form.validate_on_submit():
+        dataset_id = approve_request(requestid)
+        pass# redirect to my_data
+    return render_template('request/approve.html', form=form)

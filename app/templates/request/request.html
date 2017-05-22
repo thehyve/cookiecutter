@@ -2,7 +2,8 @@
 {% import 'macros/form_macros.html' as f %}
 
 {% block content %}
-    <div class="page-header"><h1> Selected study: {{ study_name }}</h1></div>
+    <div class="page-header"><h2> Selected study: {{ study_name }}</h2></div>
+    <h2> Request Status: {{ current_stage }}</h2>
     {% if form %}
         <caption>
             <p class="lead"><strong> Variable selection </strong></p>

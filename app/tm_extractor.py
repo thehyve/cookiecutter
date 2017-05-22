@@ -1,7 +1,10 @@
+from urllib.parse import quote
 import requests as rq
 from . import db
 from .models import Study, Variable
 
+CONCEPT_SEP = '\\'
+STUDY_NODE_INDEX = 3  # index of the study node in the full concept path
 
 def sync(username, password, transmart_url, uses_post=False):
     """Creates new studies and syncs their variables"""
@@ -80,6 +83,22 @@ def get_patients(study, token, transmart_url):
     return patients
 
 
-def get_observations(token, transmart_url, concept_paths):
-    pass
+def get_observations(token, transmart_url, study, concept_path):
+    obs = {}
+    concept_path = get_relative_concept_path(concept_path)
+    call = "{0}/studies/{1}/concepts${2}/observations".format(transmart_url, study, concept_path)
+    headers = get_auth_headers(token)
+    response = rq.get(call, headers=headers)
+    for observation in response.json():
+        patient_id = observation['subject']['id']
+        obs[patient_id] = observation['value']
+    return obs
+
+
+def get_relative_concept_path(full_concept_path):
+    sp = full_concept_path.split(CONCEPT_SEP)
+    sp = sp[STUDY_NODE_INDEX:-1]
+    relative_concept_path = "/".join(sp)
+    return quote(relative_concept_path)
+
 

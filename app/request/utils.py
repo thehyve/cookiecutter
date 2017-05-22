@@ -1,8 +1,9 @@
 from flask_wtf import Form
 from wtforms.fields import StringField, SubmitField, HiddenField, SelectField
 
-from app.models import RequestProcess
+from app.models import RequestProcess, ProcessStep, RequestVariable
 from .. import db
+from app.tm_extractor import get_observations
 
 
 def get_form(fields):
@@ -33,3 +34,17 @@ def create_default_process():
     RequestProcess.version = 1
     db.session.add(approval_process)
     db.session.commit()
+    return approval_process
+
+
+def change_status(stage_id, request):
+    stage = ProcessStep.query.filter(ProcessStep.id == stage_id).first()
+    request.status = stage.name
+    return stage
+
+
+def approve_request(requestid, token, tm_url):
+    vars = RequestVariable.query.filter(RequestVariable.request_id == requestid).all()
+    concepts = [var.variable.path for var in vars]
+    observations = get_observations(token, tm_url, concepts)
+    return make_dataset(observations, requestid)

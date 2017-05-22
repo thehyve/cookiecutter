@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms.fields import StringField, SubmitField, BooleanField
+from wtforms.fields import StringField, SubmitField, BooleanField, PasswordField
 from wtforms.validators import InputRequired, Length
 
 
@@ -18,3 +18,9 @@ class StageForm(Form):
     approval = BooleanField('Approval Stage', default=False)
     denial = BooleanField('Dismissal Stage', default=False)
     submit = SubmitField('Add new stage')
+
+
+class FinalApprovalForm(Form):
+    username = StringField('Transmart admin username', validators=[InputRequired()])
+    password = PasswordField('password', validators=[InputRequired()])
+    submit = SubmitField('Final approve - this will make requested data and related attachments available for download')

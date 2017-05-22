@@ -18,7 +18,9 @@ class RequestVariable(db.Model):
     __tablename__ = 'request_variables'
     id = db.Column(db.Integer, primary_key=True)
     request_id = db.Column(db.Integer, db.ForeignKey("requests.id"))
+    request = db.relationship("Request")
     variable_id = db.Column(db.Integer, db.ForeignKey("variables.id"))
+    variable = db.relationship("Variable")
 
 
 class RequestFieldAnswer(db.Model):
