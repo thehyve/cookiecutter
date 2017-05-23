@@ -1,10 +1,9 @@
 """
 Codebooks are expected to be small in size (up to a few thousands lines for the biggest studies).
 """
-from os.path import abspath
 from tempfile import NamedTemporaryFile
 from . import db
-from .models import Study, Variable
+from .models import Variable
 
 SEP = '\t'
 COLUMNS_NO = 5
