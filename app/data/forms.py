@@ -1,6 +1,7 @@
 from flask_wtf import Form
 from wtforms import ValidationError
 from wtforms.fields import StringField, SubmitField, PasswordField
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import InputRequired, Length
 
 
@@ -20,3 +21,11 @@ class SyncForm(Form):
     username = StringField('Transmart username', validators=[InputRequired()])
     password = PasswordField('Transmart password', validators=[InputRequired()])
     submit = SubmitField('Sync now (this operation will take a long time!)')
+
+
+class CodebookUploadForm(Form):
+    submit = SubmitField('Upload and validate codebook')
+    codebook = FileField("codebook file", validators=[
+        FileRequired(),
+        FileAllowed(['txt'], 'Text file only!')
+    ])

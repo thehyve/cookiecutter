@@ -1,0 +1,16 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% block content %}
+<h1> Codebook </h1>
+<h2> Download empty codebook template for this study </h2>
+    <a href="{{ url_for('data.codebook_generate', studyname=study.name) }}"> <input type="button" value="Generate Template"> </a>
+
+<h2> Load Codebook </h2>
+{{ f.render_form(form) }}
+{% for error in validation_errors  %}
+    <div> {{ error }} </div>
+{% endfor %}
+
+{% endblock %}
+

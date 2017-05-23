@@ -21,7 +21,6 @@ class Variable(db.Model):
     is_selected = False
 
 
-
 class Codebook(db.Model):
     __tablename__ = 'codebooks'
     id = db.Column(db.Integer, primary_key=True)
@@ -33,6 +32,7 @@ class Attachment(db.Model):
     __tablename__ = 'attachments'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256))
-    filesystem_path = db.Column(db.String(4096))
-    study_id = db.Column(db.Integer) # only one of the two can be set at the same time
-    request_id = db.Column(db.Integer)
+    uuid = db.Column(db.String(4096))
+    owner = db.Column(db.Integer, db.ForeignKey("users.id"))
+    study_id = db.Column(db.Integer, db.ForeignKey("studies.id"))  # only one of the two can be set at the same time
+    request_id = db.Column(db.Integer, db.ForeignKey("requests.id"))

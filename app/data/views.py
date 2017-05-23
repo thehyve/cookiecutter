@@ -1,13 +1,17 @@
-from flask import abort, flash, redirect, render_template, url_for, request
+from tempfile import TemporaryFile
+from flask import abort, flash, redirect, render_template, send_file
 from flask_login import current_user, login_required
 
-from .forms import (ChangeTransmartUrl, ChangeTransmartVersion, SyncForm)
+from .forms import (ChangeTransmartUrl, ChangeTransmartVersion,
+                    SyncForm, CodebookUploadForm)
 from . import data
 from .. import db
 from ..decorators import admin_required
 from flask import current_app as app
 from ..models import Role, User
 from ..tm_extractor import sync
+from ..codebooks import validate_codebook, apply_codebook, generate_codebook_template
+from ..models import Study
 
 
 @data.route('/configure-transmart', methods=['GET', 'POST'])
@@ -17,7 +21,7 @@ def configure_transmart():
     print(app.config)
     tm_url = app.config['TRANSMART_URL']
     tm_version = app.config['TRANSMART_VERSION']
-    return render_template('data/configure_transmart.html',  tm_url=tm_url,
+    return render_template('data/configure_transmart.html', tm_url=tm_url,
                            tm_version=tm_version)
 
 
@@ -44,7 +48,6 @@ def change_url():
     tm_version = app.config['TRANSMART_VERSION']
     if form.validate_on_submit():
         app.config['TRANSMART_URL'] = form.url.data
-        print(app.config)
         flash('Transmart URL changed', 'form-success')
     return render_template('data/configure_transmart.html', tm_url=tm_url,
                            tm_version=tm_version, form=form)
@@ -62,10 +65,39 @@ def sync_view():
         username = form.username.data
         sync(username, password, tm_url)
     return render_template('data/configure_transmart.html', tm_url=tm_url,
-                           tm_version=tm_version,  form=form)
+                           tm_version=tm_version, form=form)
 
 
 @data.route('/sync', methods=['GET', 'POST'])
 @login_required
 def my_data():
     return render_template('data/my_data.html')
+
+
+@data.route('/codebook/<study_name>', methods=['GET', 'POST'])
+@login_required
+def codebook_upload(study_name):
+    form = CodebookUploadForm()
+    study = Study.query.filter(Study.name == study_name).first()
+    if not study:
+        abort(404)
+    validation_errors = []
+    if form.validate_on_submit():
+        tmp = TemporaryFile()
+        form.codebook.data.save(tmp)
+        validation_errors = validate_codebook(tmp)
+        if not validation_errors:
+            apply_codebook(study, tmp)
+    return render_template('data/codebook.html', form=form,
+                           validation_errors=validation_errors, study=study)
+
+
+@data.route('/codebook-template/<studyname>', methods=['GET'])
+@login_required
+def codebook_generate(studyname):
+    study = Study.query.filter(Study.name == studyname).first()
+    if not study:
+        abort(404)
+    codebook_template = generate_codebook_template(study)
+    file_name = "{0}_codebook_template.txt".format(studyname)
+    return send_file(codebook_template, as_attachment=True, attachment_filename=file_name)

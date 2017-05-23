@@ -1,7 +1,11 @@
 {% extends 'layouts/base.html' %}
 
 {% macro study_tile(study, description = None) %}
-    <a class="column" href="{{ url_for('request.new_request', study_name=study.name) }}">
+    {% if is_admin %}
+        <a class="column" href="{{ url_for('data.codebook_upload', study_name=study.name) }}">
+    {% else %}
+        <a class="column" href="{{ url_for('request.new_request', study_name=study.name) }}">
+    {% endif %}
         <div class="ui padded segment">
             <h3 class="ui header">
                 {% if icon is not none %}
