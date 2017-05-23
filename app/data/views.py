@@ -1,4 +1,4 @@
-from tempfile import TemporaryFile
+from tempfile import NamedTemporaryFile
 from flask import abort, flash, redirect, render_template, send_file
 from flask_login import current_user, login_required
 
@@ -82,14 +82,17 @@ def codebook_upload(study_name):
     if not study:
         abort(404)
     validation_errors = []
+    report = {}
     if form.validate_on_submit():
-        tmp = TemporaryFile()
+        tmp = NamedTemporaryFile(delete=False)
         form.codebook.data.save(tmp)
-        validation_errors = validate_codebook(tmp)
+        tmp.close()
+        validation_errors = validate_codebook(tmp.name)
         if not validation_errors:
-            apply_codebook(study, tmp)
+            report = apply_codebook(study, tmp.name)
     return render_template('data/codebook.html', form=form,
-                           validation_errors=validation_errors, study=study)
+                           validation_errors=validation_errors,
+                           study=study, report=report)
 
 
 @data.route('/codebook-template/<studyname>', methods=['GET'])

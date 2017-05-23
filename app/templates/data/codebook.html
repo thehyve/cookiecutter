@@ -8,9 +8,24 @@
 
 <h2> Load Codebook </h2>
 {{ f.render_form(form) }}
+    {% if validation_errors %}
+        <div class="ui error message">
+            <i class="close icon"></i>
+            Codebook not applied
+        </div>
+    {% endif %}
 {% for error in validation_errors  %}
-    <div> {{ error }} </div>
+        <div class="ui error message">
+            <i class="close icon"></i>
+            line: {{ error[0] }}: {{ error[1] }}
+        </div>
 {% endfor %}
+{% if report %}
+    <strong> Codebook applied </strong>
+    Total number of variables: {{ report['total'] }} <br>
+    With label: {{ report['labelled'] }} <br>
+    Without label: {{ report['labelless'] }}
+{% endif %}
 
 {% endblock %}
 
