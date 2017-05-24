@@ -8,26 +8,27 @@
         <caption>
             <p class="lead"><strong> Variable selection </strong></p>
         </caption>
+        {% if not read_only %} }}
+            <div class="row">
 
-        <div class="row">
+                <div class="col-md-6">
+                    <button class="form-control" onclick="uncheckAll()">Un-check All</button>
+                </div>
+                <div class="col-md-6">
+                    <button class="form-control" onclick="checkAll()">Check all</button>
+                </div>
+            </div>
 
-            <div class="col-md-6">
-                <button class="form-control" onclick="uncheckAll()">Un-check All</button>
+            <div class="row">
+                <div class="col-md-4">
+                    <input id="search_box" type="text" class="form-control" placeholder="Search ...">
+                </div>
             </div>
-            <div class="col-md-6">
-                <button class="form-control" onclick="checkAll()">Check all</button>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4">
-                <input id="search_box" type="text" class="form-control" placeholder="Search ...">
-            </div>
-        </div>
+        {% endif %}
     {% endif %}
 
     <div id="frmt" class="demo"></div>
-    {% if form and not is_admin %}
+    {% if form and not read_only %}
         {{ f.render_form(form) }}
     {% endif %}
     {% if answers %}

@@ -1,6 +1,6 @@
 import json
 import datetime
-from flask import render_template, abort
+from flask import render_template, abort, redirect, url_for
 from flask_login import current_user
 
 from . import request_blueprint
@@ -66,7 +66,7 @@ def request_view(request_id):
     variables = Variable.query.filter(Variable.study_id == req.study.id).all()
     selected_vars = RequestVariable.query.filter(RequestVariable.request_id == req.id).all()
     selected_vars = [v.variable_id for v in selected_vars]
-    concept_tree = build_tree(variables, selected_vars)
+    concept_tree = build_tree(variables, selected_vars, disabled=not is_admin)
     concept_tree = json.dumps(concept_tree, cls=TreeEncoder)
     answers = RequestFieldAnswer.query.filter(RequestFieldAnswer.request_id == req.id).all()
     stages = ProcessStep.query.filter(ProcessStep.request_process_id == 1).all()
@@ -74,11 +74,11 @@ def request_view(request_id):
     if approval_form.validate_on_submit() and is_admin:
         current_stage = change_status(approval_form.stage.data, req)
         if current_stage.approval:
-            pass # redirect to approval page
+            return redirect(url_for('request.approve', request_id))
     return render_template('request/request.html',
                            concept_tree=concept_tree, study_name=req.study.name,
                            selected_vars=selected_vars, form=approval_form, answers=answers,
-                           is_admin=is_admin, current_stage=req.status)
+                           is_admin=is_admin, current_stage=req.status, read_only=not is_admin)
 
 
 @request_blueprint.route('/', methods=['GET', 'POST'])
@@ -137,6 +137,6 @@ def configure_stages():
 def approve(requestid):
     form = FinalApprovalForm()
     if form.validate_on_submit():
-        dataset_id = approve_request(requestid)
-        pass# redirect to my_data
+        approve_request(requestid)
+        return redirect(url_for('request.request_view', requestid))
     return render_template('request/approve.html', form=form)

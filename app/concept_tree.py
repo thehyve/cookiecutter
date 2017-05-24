@@ -3,7 +3,7 @@ import json
 TM_SEP = "\\"
 
 
-def build_tree(concepts, selected=None):
+def build_tree(concepts, selected=None, disabled=False):
     if not selected:
         selected = set()
     nodes = []
@@ -13,7 +13,7 @@ def build_tree(concepts, selected=None):
             var.is_selected = True
         splittage = var.path.split(TM_SEP)
         splittage = list(filter(lambda x: x, splittage))
-        nodes.append(TreeNode(splittage, var))
+        nodes.append(TreeNode(splittage, var, disabled))
     merged_node = nodes.pop(0)
     for node in nodes:
         merged_node.merge(node)
@@ -29,7 +29,7 @@ class TreeEncoder(json.JSONEncoder):
 
 
 class TreeNode:
-    def __init__(self, path, var):
+    def __init__(self, path, var, disabled=False):
         assert var is not None
         assert path is not None
         assert len(path) > 0
@@ -41,7 +41,7 @@ class TreeNode:
         f = path.pop(0)
         self.text = f
         if len(path) > 0 and not is_categorical_folder(path, var):
-            self.children.append(TreeNode(path, var))
+            self.children.append(TreeNode(path, var, disabled))
         else:
             self.tmVariable = {'id': var.id,
                                'code': var.code,
@@ -55,6 +55,7 @@ class TreeNode:
             self.icon = "jstree-file"
             if var.is_selected:
                 self.state['selected'] = True
+        self.state['disabled'] = disabled
 
     def is_leaf(self):
         return len(self.children) == 0
