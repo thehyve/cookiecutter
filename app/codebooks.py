@@ -18,14 +18,16 @@ def apply_codebook(study, codebook_file):
 
 def _bind_codebook(study, mappings):
     variables = Variable.query.filter(Variable.study_id == study.id).all()
+    all_concepts = [var.path for var in variables]
     var_map = {variable.code: variable for variable in variables}
     labelled = 0
+    folders = len([var for var in variables if _is_folder(var.path, all_concepts)])
     for variable_code, variable_label in mappings:
         var = var_map[variable_code]  # if validation works properly there should never be KeyError here
         var.label = variable_label
         labelled += 1
     db.session.commit()
-    labelless = len(variables) - labelled
+    labelless = len(variables) - labelled - folders
     return {'total': len(variables), 'labelless': labelless, 'labelled': labelled}
 
 
