@@ -67,7 +67,7 @@ def sync_view():
                            tm_version=tm_version, form=form)
 
 
-@data.route('/request-data/<requestid:int>')
+@data.route('/request-data/<requestid>')
 @login_required
 def data_view(requestid):
     req = Request.query.filter(Request.id == requestid).first()
