@@ -19,7 +19,7 @@
                 <td> {{ request.issued_time }}</td>
                 <td> {{ request.status }} </td>
                 <td> <a href="{{ url_for('request.request_view', request_id=request.id)}}">see request </a> </td>
-                <a href="{{ url_for('data.data_view', request_id=request.id)}}">see request </a> </td>
+                <td> <a href="{{ url_for('data.data_view', requestid=request.id)}}">see attachments </a> </td>
             </tr>
         {% endfor %}
     </table>
