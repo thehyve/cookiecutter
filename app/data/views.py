@@ -8,7 +8,7 @@ from . import data
 from .. import db
 from ..decorators import admin_required
 from flask import current_app as app
-from ..models import Role, User
+from ..models import Role, User, Request, Attachment
 from ..tm_extractor import sync
 from ..codebooks import validate_codebook, apply_codebook, generate_codebook_template
 from ..models import Study
@@ -18,7 +18,6 @@ from ..models import Study
 @login_required
 @admin_required
 def configure_transmart():
-    print(app.config)
     tm_url = app.config['TRANSMART_URL']
     tm_version = app.config['TRANSMART_VERSION']
     return render_template('data/configure_transmart.html', tm_url=tm_url,
@@ -68,10 +67,16 @@ def sync_view():
                            tm_version=tm_version, form=form)
 
 
-@data.route('/sync', methods=['GET', 'POST'])
+@data.route('/request-data/<requestid:int>')
 @login_required
-def my_data():
-    return render_template('data/my_data.html')
+def data_view(requestid):
+    req = Request.query.filter(Request.id == requestid).first()
+    if not req:
+        abort(404)
+    if not req.user_id == current_user.id and not current_user.is_admin():
+        abort(403)
+    attachments = Attachment.query.filter(Attachment.request_id == req.id).all()
+    return render_template('data/request_data.html', attachments=attachments)
 
 
 @data.route('/codebook/<study_name>', methods=['GET', 'POST'])

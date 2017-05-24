@@ -1,0 +1,17 @@
+{% extends 'layouts/base.html' %}
+{% import 'macros/form_macros.html' as f %}
+
+{% block content %}
+    <table class="table table-bordered">
+        <tr>
+            <th> File Name </th>
+            <th> Download Link</th>
+        </tr>
+        {% for attachment in attachments %}
+            <tr>
+                <td> {{ attachment.name }}</td>
+                <td> {{ url_for('data.download', attachment.id)}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
