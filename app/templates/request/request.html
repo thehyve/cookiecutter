@@ -3,12 +3,14 @@
 
 {% block content %}
     <div class="page-header"><h2> Selected study: {{ study_name }}</h2></div>
+    {% if current_stage %}
     <h2> Request Status: {{ current_stage }}</h2>
+    {% endif %}
     {% if form %}
         <caption>
             <p class="lead"><strong> Variable selection </strong></p>
         </caption>
-        {% if not read_only %} }}
+        {% if not read_only %}
             <div class="row">
 
                 <div class="col-md-6">
@@ -28,7 +30,7 @@
     {% endif %}
 
     <div id="frmt" class="demo"></div>
-    {% if form and not read_only %}
+    {% if form and not is_admin %}
         {{ f.render_form(form) }}
     {% endif %}
     {% if answers %}

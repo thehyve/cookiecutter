@@ -18,7 +18,7 @@ def get_form(fields):
 
 
 def get_approval_form(stages):
-    choices = [(stage.id, stage.name) for stage in stages]
+    choices = [(str(stage.id), stage.name) for stage in stages]
     class_body = {'submit': SubmitField('Submit'), 'stage': SelectField('Change Request Stage', choices=choices)}
     DynamicForm = type('DynamicForm', (Form,), class_body)
     form = DynamicForm()
