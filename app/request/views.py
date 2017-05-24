@@ -15,7 +15,8 @@ from ..concept_tree import build_tree, TreeEncoder
 
 from flask_login import login_required
 from .. import db
-from .utils import (get_approval_form, get_form, parse_request_vars, create_default_process, change_status)
+from .utils import (get_approval_form, get_form,
+                    parse_request_vars, create_default_process)
 
 
 @request_blueprint.route('/new/<study_name>', methods=['GET', 'POST'])
@@ -72,9 +73,13 @@ def request_view(request_id):
     stages = ProcessStep.query.filter(ProcessStep.request_process_id == 1).all()
     approval_form = get_approval_form(stages)
     if approval_form.validate_on_submit() and is_admin:
-        current_stage = change_status(approval_form.stage.data, req)
-        if current_stage.approval:
+        stage_id = int(approval_form.stage.data)
+        stage = ProcessStep.query.filter(ProcessStep.id == stage_id).first()
+        if stage.approves:
             return redirect(url_for('request.approve', request_id))
+        else:
+            req.status = stage.name
+            db.session.commit()
     return render_template('request/request.html',
                            concept_tree=concept_tree, study_name=req.study.name,
                            selected_vars=selected_vars, form=approval_form, answers=answers,
@@ -137,6 +142,8 @@ def configure_stages():
 def approve(requestid):
     form = FinalApprovalForm()
     if form.validate_on_submit():
-        approve_request(requestid)
+        username = form.username.data
+        pwd = form.password.data
+        approve_request(requestid, username, pwd)
         return redirect(url_for('request.request_view', requestid))
     return render_template('request/approve.html', form=form)

@@ -37,12 +37,6 @@ def create_default_process():
     return approval_process
 
 
-def change_status(stage_id, request):
-    stage = ProcessStep.query.filter(ProcessStep.id == stage_id).first()
-    request.status = stage.name
-    return stage
-
-
 def approve_request(requestid, token, tm_url):
     vars = RequestVariable.query.filter(RequestVariable.request_id == requestid).all()
     concepts = [var.variable.path for var in vars]

@@ -59,8 +59,11 @@ def validate_codebook(codebook_file):
 
 def generate_codebook_template(study):
     variables = Variable.query.filter(Variable.study_id == study.id).all()
+    all_concepts = [var.path for var in variables]
     entries = []
     for variable in variables:
+        if _is_folder(variable.path, all_concepts):
+            continue
         line = []
         line.append(variable.code)
         line.append('REPLACE_WITH_LABEL')
@@ -75,3 +78,10 @@ def generate_codebook_template(study):
     tmp_file.write(codebook_text)
     tmp_file.close()
     return tmp_file.name
+
+
+def _is_folder(concept, concepts):
+    for c in concepts:
+        if concept in c and not c == concept:
+            return True
+    return False

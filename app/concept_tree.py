@@ -8,7 +8,6 @@ def build_tree(concepts, selected=None, disabled=False):
         selected = set()
     nodes = []
     for var in concepts:
-        is_selected = False
         if var.id in selected:
             var.is_selected = True
         splittage = var.path.split(TM_SEP)
@@ -55,6 +54,8 @@ class TreeNode:
             self.icon = "jstree-file"
             if var.is_selected:
                 self.state['selected'] = True
+            if var.label:
+                self.text += ' ({0})'.format(var.label)
         self.state['disabled'] = disabled
 
     def is_leaf(self):
