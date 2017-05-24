@@ -77,4 +77,9 @@ def create_app(config_name):
     from .request import request_blueprint
     app.register_blueprint(request_blueprint, url_prefix='/request')
 
+    @app.after_request
+    def add_header(response):
+        response.cache_control.max_age = 0
+        return response
+
     return app
