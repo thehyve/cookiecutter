@@ -69,7 +69,7 @@ def sync_view():
                            tm_version=tm_version, form=form)
 
 
-@data.route('/request-data/<requestid>')
+@data.route('/request-data/<requestid>', methods=['GET', 'POST'])
 @login_required
 def data_view(requestid):
     req = Request.query.filter(Request.id == requestid).first()
@@ -77,8 +77,11 @@ def data_view(requestid):
         abort(404)
     if not req.user_id == current_user.id and not current_user.is_admin():
         abort(403)
-    attachments = Attachment.query.filter(Attachment.request_id == req.id).all()
     form = AttachmentUploadForm()
+    if form.validate_on_submit():
+        uploaded = form.codebook.data
+        register_request_attachment(uploaded.read(), uploaded.filename, current_user, req) # TODO: for bigger files thats not sustainable
+    attachments = Attachment.query.filter(Attachment.request_id == req.id).all()
     return render_template('data/attachment_management.html', attachments=attachments, form=form)
 
 @data.route('/remove/<attachmentid>')
