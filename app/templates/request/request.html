@@ -30,7 +30,7 @@
     {% endif %}
 
     <div id="frmt" class="demo"></div>
-    {% if form and not is_admin %}
+    {% if form and not is_admin and not read_only%}
         {{ f.render_form(form) }}
     {% endif %}
     {% if answers %}
