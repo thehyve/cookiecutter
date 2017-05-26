@@ -52,6 +52,7 @@ def new_request(study_name):
             answer.request_id = new_request.id
             db.session.add(answer)
         db.session.commit()
+        return redirect(url_for('request.my_requests'))
 
     return render_template('request/request.html',
                            concept_tree=concept_tree, study_name=study_name, form=form)
@@ -76,7 +77,7 @@ def request_view(request_id):
         stage_id = int(approval_form.stage.data)
         stage = ProcessStep.query.filter(ProcessStep.id == stage_id).first()
         if stage.approves:
-            return redirect(url_for('request.approve', request_id))
+            return redirect(url_for('request.approve', requestid=request_id))
         else:
             req.status = stage.name
             db.session.commit()

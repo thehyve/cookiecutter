@@ -9,7 +9,7 @@ from redis import Redis
 from rq import Connection, Queue, Worker
 
 from app import create_app, db
-from app.models import Role, User, RequestProcess, RequestField
+from app.models import Role, User, RequestProcess, RequestField, Study, Variable
 
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
@@ -56,21 +56,19 @@ def add_fake_data(number_users):
     """
     Adds fake data to the database.
     """
-    User.generate_fake(count=number_users)
-    default_process = RequestProcess()
-    default_process.version = 1
-    db.session.add(default_process)
+    study = Study()
+    study.name = 'test_study'
+    study.patients = 10
+    study.variables = 10
+    db.session.add(study)
     db.session.commit()
-    request_field1 = RequestField()
-    request_field1.mandatory = True
-    request_field1.name = 'generic mandatory'
-    request_field1.process_id = default_process.id
-    request_field2 = RequestField()
-    request_field2.mandatory = False
-    request_field2.name = 'generic optional'
-    request_field2.process_id = default_process.id
-    db.session.add(request_field1)
-    db.session.add(request_field2)
+    variables = [Variable() for i in range(10)]
+    for i,v in enumerate(variables):
+        v.code = 'variable' + str(i)
+        v.path = '\\\\folder1\\folder2\\variable'+ str(i)
+        v.type = 'NUMERIC'
+        v.study_id = study.id
+        db.session.add(v)
     db.session.commit()
 
 

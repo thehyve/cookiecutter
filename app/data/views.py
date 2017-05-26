@@ -1,9 +1,10 @@
+import os
 from tempfile import NamedTemporaryFile
-from flask import abort, flash, redirect, render_template, send_file
+from flask import abort, flash, redirect, render_template, send_file, url_for, request
 from flask_login import current_user, login_required
 
 from .forms import (ChangeTransmartUrl, ChangeTransmartVersion,
-                    SyncForm, CodebookUploadForm)
+                    SyncForm, CodebookUploadForm, AttachmentUploadForm)
 from . import data
 from .. import db
 from ..decorators import admin_required
@@ -12,6 +13,7 @@ from ..models import Role, User, Request, Attachment
 from ..tm_extractor import sync
 from ..codebooks import validate_codebook, apply_codebook, generate_codebook_template
 from ..models import Study
+from ..attachments import register_request_attachment, register_study_attachment, get_attachment
 
 
 @data.route('/configure-transmart', methods=['GET', 'POST'])
@@ -76,7 +78,48 @@ def data_view(requestid):
     if not req.user_id == current_user.id and not current_user.is_admin():
         abort(403)
     attachments = Attachment.query.filter(Attachment.request_id == req.id).all()
-    return render_template('data/request_data.html', attachments=attachments)
+    form = AttachmentUploadForm()
+    return render_template('data/attachment_management.html', attachments=attachments, form=form)
+
+@data.route('/remove/<attachmentid>')
+@login_required
+def remove(attachmentid):
+    attachment = Attachment.query.filter(Attachment.id == attachmentid).first()
+    if not attachment:
+        abort(404)
+    if not current_user.id == attachment.owner and not current_user.is_admin():
+        abort(403)
+    file_path = get_attachment(attachment)
+    os.unlink(file_path)
+    db.session.delete(attachment)
+    db.session.commit()
+    return redirect(request.referrer)
+
+
+@data.route('/download/<attachmentid>')
+@login_required
+def download(attachmentid):
+    attachment = Attachment.query.filter(Attachment.id == attachmentid).first()
+    if not attachment:
+        abort(404)
+    if not attachment.owner == current_user.id and not current_user.is_admin():
+        abort(403)
+    attachment_file = get_attachment(attachment)
+    return send_file(attachment_file, as_attachment=True, attachment_filename=attachment.name)
+
+@data.route('/study-data/<studyid>',  methods=['GET', 'POST'])
+@login_required
+@admin_required
+def study_data_view(studyid):
+    study = Study.query.filter(Study.id== studyid).first()
+    if not study:
+        abort(404)
+    form = AttachmentUploadForm()
+    if form.validate_on_submit():
+        uploaded = form.codebook.data
+        register_study_attachment(uploaded.read(), uploaded.filename, current_user, study) # TODO: for bigger files thats not sustainable
+    attachments = Attachment.query.filter(Attachment.study_id == studyid).all()
+    return render_template('data/attachment_management.html', attachments=attachments, form=form)
 
 
 @data.route('/codebook/<study_name>', methods=['GET', 'POST'])

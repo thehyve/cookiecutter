@@ -6,12 +6,15 @@
         <tr>
             <th> File Name </th>
             <th> Download Link</th>
+            <th> Remove </th>
         </tr>
         {% for attachment in attachments %}
             <tr>
                 <td> {{ attachment.name }}</td>
-                <td> {{ url_for('data.download', attachment.id)}}</td>
+                <td> <a href="{{ url_for('data.download', attachmentid=attachment.id)}}"> Download  </a> </td>
+                <td> <a href="{{ url_for('data.remove', attachmentid=attachment.id)}}"> Remove </a> </td>
             </tr>
         {% endfor %}
     </table>
+{{ f.render_form(form) }}
 {% endblock %}

@@ -4,8 +4,17 @@ from os.path import join
 from .models import Attachment
 from . import db
 
-FILESTORE_PATH = '~/.dp_filestore'  # TODO: make configurable
+FILESTORE_PATH = '/tmp/.dp_filestore'  # TODO: make configurable
 
+def ensure_filestore():
+    """ Ensure filestore folder exists"""
+    if not os.path.exists(FILESTORE_PATH):
+        os.mkdir(FILESTORE_PATH)
+
+
+def get_attachment(attachment):
+    path = os.path.join(FILESTORE_PATH, attachment.uuid)
+    return path
 
 def make_dataset(observations_tsv_str, user, request):
     return register_request_attachment(observations_tsv_str, 'data.txt', user, request, False)
@@ -27,8 +36,8 @@ def register_request_attachment(attachment_file_content, original_name, user, re
     return new_attachment
 
 
-def _register_attachment(attachment_file_content, original_name, user):
-    file_uuid = _deposit_file(attachment_file_content)
+def _register_attachment(attachment_file_content, original_name, user, binary_content= True):
+    file_uuid = _deposit_file(attachment_file_content, binary_content)
     new_attachment = Attachment()
     new_attachment.uuid = file_uuid
     new_attachment.owner = user.id
@@ -36,9 +45,10 @@ def _register_attachment(attachment_file_content, original_name, user):
     return new_attachment
 
 
-def _deposit_file(attachment_file_content, binary=True):
+def _deposit_file(attachment_file_content, binary):
     """ Deposit contents of the file into the filestore. 
     Returns uuid identifying it."""
+    ensure_filestore()
     if binary:
         mode = 'bw'
     else:

@@ -29,3 +29,10 @@ class CodebookUploadForm(Form):
         FileRequired(),
         FileAllowed(['txt'], 'Text file only!')
     ])
+
+class AttachmentUploadForm(Form):
+    submit = SubmitField('Upload attachment')
+    codebook = FileField("Select file for upload", validators=[
+        FileRequired(),
+        FileAllowed(['txt', 'pdf', 'doc', 'docx', 'zip', 'gz', 'xls', 'xlsx'], 'Only following extensions:txt ,pdf ,doc ,docx ,zip ,gz ,xls ,xlsx!')
+    ])

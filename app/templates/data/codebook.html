@@ -3,7 +3,8 @@
 
 {% block content %}
 <h2> Download empty codebook template for this study </h2>
-    <a href="{{ url_for('data.codebook_generate', studyname=study.name) }}"> <input type="button" value="Generate Template"> </a>
+    <a href="{{ url_for('data.codebook_generate', studyname=study.name) }}"> 
+        <input type="button" class="ui button" value="Generate Template"> </a>
 
 <h2> Load Codebook </h2>
 {{ f.render_form(form) }}
@@ -25,6 +26,10 @@
     With label: {{ report['labelled'] }} <br>
     Without label: {{ report['labelless'] }}
 {% endif %}
+
+<h2> Study Attachments </h2>
+Attachments added on the study level will be added to the request after the final approval <br>
+<a href="{{url_for('data.study_data_view', studyid=study.id)}}"> <input class="ui button" type="button" value="Configure Attachments"> </a>
 
 {% endblock %}
 
