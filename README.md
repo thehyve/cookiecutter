@@ -1,3 +1,11 @@
+# Cookiecutter Data Portal for tranSMART
+This is a simple request portal with basic support for codebooks and file sharing. It is capable of extracting 
+requested variables from tranSMART ver 1.2. Adapting it to higher version is easily possible. 
+Use config.env to configure which transmart instance to integrate with.
+ 
+     TRANSMART_URL=https://domain.com/transmart
+Log in as an admin (see flask-base docs below for details on configuration) and sync studies using
+Admin Dashboard/tranSMART config
 # flask-base 
 [![Circle CI](https://circleci.com/gh/hack4impact/flask-base.svg?style=svg)](https://circleci.com/gh/hack4impact/flask-base) [![Stories in Ready](https://badge.waffle.io/hack4impact/flask-base.png?label=ready&title=Ready)](https://waffle.io/hack4impact/flask-base) 
 [![Code Climate](https://codeclimate.com/github/hack4impact/flask-base/badges/gpa.svg)](https://codeclimate.com/github/hack4impact/flask-base/coverage) 
