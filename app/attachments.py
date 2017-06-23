@@ -16,7 +16,8 @@ def get_attachment(attachment):
     path = os.path.join(FILESTORE_PATH, attachment.uuid)
     return path
 
-def make_dataset(observations_tsv_str, user, request):
+
+def deposit_dataset(observations_tsv_str, user, request):
     return register_request_attachment(observations_tsv_str, 'data.txt', user, request, False)
 
 

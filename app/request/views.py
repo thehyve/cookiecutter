@@ -2,7 +2,7 @@ import json
 import datetime
 from flask import render_template, abort, redirect, url_for
 from flask_login import current_user
-
+from flask import current_app as app
 from . import request_blueprint
 
 from .forms import NewFieldForm, StageForm, FinalApprovalForm
@@ -16,7 +16,8 @@ from ..concept_tree import build_tree, TreeEncoder
 from flask_login import login_required
 from .. import db
 from .utils import (get_approval_form, get_form,
-                    parse_request_vars, create_default_process)
+                    parse_request_vars, create_default_process, approve_request)
+from ..tm_extractor import authenticate
 
 
 @request_blueprint.route('/new/<study_name>', methods=['GET', 'POST'])
@@ -145,6 +146,11 @@ def approve(requestid):
     if form.validate_on_submit():
         username = form.username.data
         pwd = form.password.data
-        approve_request(requestid, username, pwd)
-        return redirect(url_for('request.request_view', requestid))
+        request = Request.query.filter(Request.id == requestid).first()
+        tm_url = app.config['TRANSMART_URL']
+        if not request:
+            abort(404)
+        token = authenticate(username, pwd, tm_url)
+        approve_request(request, token, tm_url)
+        return redirect(url_for('data.data_view', requestid=requestid))
     return render_template('request/approve.html', form=form)

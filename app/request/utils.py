@@ -1,9 +1,10 @@
 from flask_wtf import Form
 from wtforms.fields import StringField, SubmitField, HiddenField, SelectField
 
-from app.models import RequestProcess, ProcessStep, RequestVariable
+from app.models import RequestProcess, RequestVariable, User, Attachment
 from .. import db
-from app.tm_extractor import get_observations
+from app.tm_extractor import get_observations, observations_to_tsv
+from ..attachments import deposit_dataset, get_attachment, register_request_attachment
 
 
 def get_form(fields):
@@ -37,8 +38,20 @@ def create_default_process():
     return approval_process
 
 
-def approve_request(requestid, token, tm_url):
-    vars = RequestVariable.query.filter(RequestVariable.request_id == requestid).all()
-    concepts = [var.variable.path for var in vars]
-    observations = get_observations(token, tm_url, concepts)
-    return make_dataset(observations, requestid)
+def approve_request(request, token, tm_url):
+    user = User.query.filter(User.id == request.user_id).first()
+    _vars = RequestVariable.query.filter(RequestVariable.request_id == request.id).all()
+    concepts = [var.variable.path for var in _vars]
+    observations = get_observations(token, tm_url, request.study.name, concepts)
+    tsv = observations_to_tsv(observations)
+    attach_study_attachments(request)
+    return deposit_dataset(tsv, user, request)
+
+
+def attach_study_attachments(request):
+    study_attachments = Attachment.query.filter(Attachment.study_id == request.study_id).all()
+    for att in study_attachments:
+        att_path = get_attachment(att)
+        with open(att_path, 'rb') as outfile:
+            content = outfile.read()
+            register_request_attachment(content, att.name, request.user, request, True)

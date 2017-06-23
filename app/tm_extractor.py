@@ -97,7 +97,7 @@ def _get_observations(token, transmart_url, study, concept_path):
     """
     obs = {}
     concept_path = _get_relative_concept_path(concept_path)
-    call = "{0}/studies/{1}/concepts${2}/observations".format(transmart_url, study, concept_path)
+    call = "{0}/studies/{1}/concepts/{2}/observations".format(transmart_url, study, concept_path)
     headers = get_auth_headers(token)
     response = rq.get(call, headers=headers)
     for observation in response.json():
